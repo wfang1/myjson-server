@@ -70,6 +70,7 @@ const Model = ((classSelection, view) => {
             this.name = name;
             this.required = required;
             this.credit = credit;
+            this.selected = false;
         }
     }
 
@@ -113,13 +114,14 @@ const Model = ((classSelection, view) => {
 const Controller = ((model, view) => {
     const state = new model.State();
 
+    // initializes all the 'buttons' to be able to be clicked
     const clickClass = () => {
         const availableContainer = document.querySelector(view.domStr.availableClasses);
         availableContainer.addEventListener('click', (event) => {
             // this is sloppy but i can't think of how to clean it up for now
             console.log(event.target.className);
             //event.target.className = 'odd-box-selected';
-        });
+        }, true);
     }
 
     // initialization
@@ -140,3 +142,8 @@ const Controller = ((model, view) => {
 })(Model, View);
 
 Controller.bootstrap();
+
+// Note on VMC -
+// View handles visual, such as the element lines themselves
+// Model handles the data structure and calls view
+// Controller is the only method allowed to the user to control the system
