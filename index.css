@@ -1,0 +1,113 @@
+* {
+    font-family: 'Arial';
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+#selection-boxes {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-evenly;
+    margin-top: 3rem;
+
+    height: 25rem;
+}
+
+form {
+    overflow-y: scroll;
+    overflow-x: none;
+
+    border-style: solid;
+    border-color: black;
+}
+
+#credit-list {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+#select-button {
+    margin-left: 1rem;
+    padding: 0.2rem;
+    margin-top: -0.3rem;
+}
+
+.courses {
+    display: flex;
+    flex-direction: column;
+}
+
+.even-box {
+    height: 4rem;
+    width: 15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    text-align: center;
+    
+
+    border-style: solid;
+
+    background-color: rgb(221, 239, 221);
+}
+
+.odd-box {
+    height: 4rem;
+    width: 15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    text-align: center;
+
+    border-style: solid;
+
+    background-color: white;
+}
+
+.even-box-selected {
+    height: 4rem;
+    width: 15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    text-align: center;
+
+    border-style: solid;
+
+    background-color: skyblue;
+}
+
+.odd-box-selected {
+    height: 4rem;
+    width: 15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    text-align: center;
+
+    border-style: solid;
+
+    background-color: skyblue;
+}
+
+h4 {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    margin-left: 3.4rem;
+    margin-right: 3.4rem;
+}
+
