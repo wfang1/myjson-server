@@ -59,7 +59,6 @@ form {
 
     border-style: solid;
     border-width: 0.1rem;
-    border-bottom-width: 0rem;
 
     background-color: rgb(221, 239, 221);
 }
@@ -75,7 +74,6 @@ form {
 
     border-style: solid;
     border-width: 0.1rem;
-    border-bottom-width: 0rem;
 
     background-color: white;
 }
@@ -91,7 +89,6 @@ form {
 
     border-style: solid;
     border-width: 0.1rem;
-    border-bottom-width: 0rem;
 
     background-color: skyblue;
 }
@@ -107,7 +104,6 @@ form {
 
     border-style: solid;
     border-width: 0.1rem;
-    border-bottom-width: 0rem;
 
     background-color: skyblue;
 }

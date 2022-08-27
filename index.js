@@ -36,9 +36,13 @@ const View = (() => {
     }
 
     // creating string to be inputted
-    const createTmp = (arr) => {
+    const createTmp = (arr, clickable) => {
         let tmp = ''; // empty html string
         let index = 0; // coloring index
+        let clickFunction = '';
+        if(clickable === true) {
+            clickFunction = 'onclick="Controller.clickClass(this)"';
+        }
         
         arr.forEach((course) => {
             let required = '';
@@ -53,7 +57,7 @@ const View = (() => {
                 classBox = domStr.oddBox;
 
             tmp += `
-            <div class="${classBox}" onclick="Controller.clickClass(this)" id="${course.courseId}">
+            <div class="${classBox}" ${clickFunction} id="${course.courseId}">
                 <p>${course.courseName}</p>
                 <p>Course Type: ${required}</p>
                 <p>Course Credit: ${course.credit}</p>
@@ -94,7 +98,7 @@ const Model = ((classSelection, view) => {
             this.#availableList = [...newList];
 
             const availableClasses = document.querySelector(view.domStr.availableClasses);
-            const tmp = view.createTmp(this.#availableList);
+            const tmp = view.createTmp(this.#availableList, true);
             view.render(availableClasses, tmp);
         }
         get selectedList() {
@@ -104,12 +108,14 @@ const Model = ((classSelection, view) => {
             this.#selectedList = [...newList];
 
             const selectedClasses = document.querySelector(view.domStr.selectedClasses);
-            const tmp = view.createTmp(this.#selectedList);
+            const tmp = view.createTmp(this.#selectedList, false);
             view.render(selectedClasses, tmp);
         }
         get creditCount() {
             return this.#creditCount;
         }
+
+        // special modifiers and getters
         addCredits(id) {
             // get course and id
             let course = this.getCourseFromId(id);
@@ -161,6 +167,30 @@ const Model = ((classSelection, view) => {
             console.log("Course id " + id + " wasn't able to be found!");
             return null;
         }
+        moveCourses() {
+            // check classes of available with id and add them
+            let newSList = [];
+            let newAList = [...this.#availableList];
+            for(let id of this.#prospectList) {
+                newSList.push(this.getCourseFromId(id));
+                this.removeCourse(id, newAList);
+            }
+
+            return {
+                newSList,
+                newAList
+            }
+        }
+        removeCourse(id, array) {
+            for(let i = 0; i < array.length; ++i) {
+                if(array[i].courseId == id) {
+                    array.splice(i, 1);
+                    return;
+                }
+            }
+
+            console.log('Course id: ' + id + ' removal unsuccessful!');
+        }
     }
     // i'm leaving this as an object if we need to add future html functions
     const {getCourses} = classSelection;
@@ -209,11 +239,17 @@ const Controller = ((model, view) => {
     }
 
     // handles clicking on select
-    const clickSelect = () => {
+    const clickSelect = (element) => {
         // pop up window
         let result = confirm(view.winMessages.selectMessage(state.creditCount));
         if(result === true) { // handle moving objects
+            // run through the ids in prospect move them over to selected
+            let courseLists = state.moveCourses();
+            state.availableList = [...courseLists.newAList];
+            state.selectedList = [...courseLists.newSList];
 
+            // disable the button
+            element.disabled = true;
         }
         // don't do anything otherwise
     }
