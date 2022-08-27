@@ -18,10 +18,19 @@ const View = (() => {
         availableClasses: '#available',
         selectedClasses: '#selected',
         evenBox: 'even-box',
-        oddBox: 'odd-box'
+        oddBox: 'odd-box',
+        totalCredits: '#total-credits'
     }
 
-    //rendering funciton
+    // strings for messages
+    const winMessages = {
+        tooManyCredits: "You can only choose up to 18 credits in one semester",
+        selectMessage: (totalCredits) => {
+            return "You have chosen " + totalCredits + " credits for this semester. You cannot change once you submit. Do you want to confirm?";
+        }
+    }
+
+    //rendering function
     const render = (ele, tmp) => {
         ele.innerHTML = tmp;
     }
@@ -44,7 +53,7 @@ const View = (() => {
                 classBox = domStr.oddBox;
 
             tmp += `
-            <div class="${classBox}">
+            <div class="${classBox}" onclick="Controller.clickClass(this)" id="${course.courseId}">
                 <p>${course.courseName}</p>
                 <p>Course Type: ${required}</p>
                 <p>Course Credit: ${course.credit}</p>
@@ -55,28 +64,27 @@ const View = (() => {
         return tmp;
     }
 
+    // this function returns the innerhtml for handling display of credits
+    const modifyCredits = (num) => {
+        return "Total Credits: " + num;
+    }
+
     return {
         domStr,
+        winMessages,
         render,
-        createTmp
+        createTmp,
+        modifyCredits
     };
 })(); // passes none
 
 // MODEL
 const Model = ((classSelection, view) => {
-    class Course {
-        constructor(id, name, required, credit) {
-            this.id = id;
-            this.name = name;
-            this.required = required;
-            this.credit = credit;
-            this.selected = false;
-        }
-    }
-
     class State {
         #availableList = [];
         #selectedList = [];
+        #creditCount = 0;
+        #prospectList = []; // list of ids that are selected
 
         // getters and setters
         get availableList() {
@@ -95,9 +103,63 @@ const Model = ((classSelection, view) => {
         set selectedList(newList) {
             this.#selectedList = [...newList];
 
-            const selectedClasses = document.querySelector(view.domstr.selectedClasses);
+            const selectedClasses = document.querySelector(view.domStr.selectedClasses);
             const tmp = view.createTmp(this.#selectedList);
             view.render(selectedClasses, tmp);
+        }
+        get creditCount() {
+            return this.#creditCount;
+        }
+        addCredits(id) {
+            // get course and id
+            let course = this.getCourseFromId(id);
+            let num = course.credit;
+
+            // error handling
+            if(this.#creditCount + num > 18) {
+                alert(view.winMessages.tooManyCredits);
+                return false;
+            }
+
+            // change credit display
+            this.#creditCount += num;
+            const creditDisplayer = document.querySelector(view.domStr.totalCredits);
+            const tmp = view.modifyCredits(this.#creditCount);
+            view.render(creditDisplayer, tmp);
+
+            // add id to the array
+            this.#prospectList.push(id);
+
+            return true;
+        }
+        subtractCredits(id) {
+            // get course and id
+            let course = this.getCourseFromId(id);
+            let num = course.credit;
+
+            // change credit display
+            this.#creditCount -= num;
+            const creditDisplayer = document.querySelector(view.domStr.totalCredits);
+            const tmp = view.modifyCredits(this.#creditCount);
+            view.render(creditDisplayer, tmp);
+
+            // remove id from array
+            for(let i = 0; i < this.#prospectList.length; ++i) {
+                if(this.#prospectList[i] === id) {
+                    this.#prospectList.splice(i, 1);
+                    break;
+                }
+            }
+        }
+        getCourseFromId(id) {
+            for(let course of this.#availableList) {
+                if(course.courseId == id) { // not === here is necessary; otherwise it won't read
+                    return course;
+                }
+            }
+
+            console.log("Course id " + id + " wasn't able to be found!");
+            return null;
         }
     }
     // i'm leaving this as an object if we need to add future html functions
@@ -105,7 +167,6 @@ const Model = ((classSelection, view) => {
 
     return {
         getCourses,
-        Course,
         State
     }
 })(classSelection, View);
@@ -114,14 +175,47 @@ const Model = ((classSelection, view) => {
 const Controller = ((model, view) => {
     const state = new model.State();
 
-    // initializes all the 'buttons' to be able to be clicked
-    const clickClass = () => {
-        const availableContainer = document.querySelector(view.domStr.availableClasses);
-        availableContainer.addEventListener('click', (event) => {
-            // this is sloppy but i can't think of how to clean it up for now
-            console.log(event.target.className);
-            //event.target.className = 'odd-box-selected';
-        }, true);
+    // class used for handling clicking the class
+    const clickClass = (element) => {
+        // I wish I knew a cleaner way of doing this but I don't
+        let isSelected = false;
+
+        if(element.className === 'even-box') {
+            element.className = 'even-box-selected';
+            isSelected = true;
+        }
+        else if(element.className === 'odd-box') {
+            element.className = 'odd-box-selected';
+            isSelected = true;
+        }
+        else if(element.className === 'even-box-selected')
+            element.className = 'even-box';
+        else if(element.className === 'odd-box-selected')
+            element.className = 'odd-box';
+
+        // if it's selected, then we add, otherwise subtract
+        if(isSelected === true) {
+            if(state.addCredits(element.id) === false) {
+                // reverse colors if we have too many credits
+                // copy paste is bad but this is actually more efficient (by a little)
+                if(element.className === 'even-box-selected')
+                    element.className = 'even-box';
+                else if(element.className === 'odd-box-selected')
+                    element.className = 'odd-box';
+            }
+        } else {
+            state.subtractCredits(element.id);
+        }
+    }
+
+    // handles clicking on select
+    const clickSelect = () => {
+        // pop up window
+        let result = confirm(view.winMessages.selectMessage(state.creditCount));
+        if(result === true) { // handle moving objects
+
+        }
+        // don't do anything otherwise
     }
 
     // initialization
@@ -133,11 +227,12 @@ const Controller = ((model, view) => {
 
     const bootstrap = () => {
         init();
-        clickClass();
     }
 
     return {
         bootstrap,
+        clickClass,
+        clickSelect
     }
 })(Model, View);
 

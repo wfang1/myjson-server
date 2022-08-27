@@ -20,7 +20,7 @@ h1 {
 }
 
 form {
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: none;
 
     border-style: solid;
@@ -44,6 +44,8 @@ form {
 .courses {
     display: flex;
     flex-direction: column;
+    height: 300px;
+    width: 200px;
 }
 
 .even-box {
@@ -54,9 +56,10 @@ form {
     justify-content: center;
 
     text-align: center;
-    
 
     border-style: solid;
+    border-width: 0.1rem;
+    border-bottom-width: 0rem;
 
     background-color: rgb(221, 239, 221);
 }
@@ -71,6 +74,8 @@ form {
     text-align: center;
 
     border-style: solid;
+    border-width: 0.1rem;
+    border-bottom-width: 0rem;
 
     background-color: white;
 }
@@ -85,6 +90,8 @@ form {
     text-align: center;
 
     border-style: solid;
+    border-width: 0.1rem;
+    border-bottom-width: 0rem;
 
     background-color: skyblue;
 }
@@ -99,6 +106,8 @@ form {
     text-align: center;
 
     border-style: solid;
+    border-width: 0.1rem;
+    border-bottom-width: 0rem;
 
     background-color: skyblue;
 }
